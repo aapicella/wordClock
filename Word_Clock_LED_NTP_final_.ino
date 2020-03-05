@@ -2,10 +2,14 @@
 #include <MD_MAX72xx.h>
 #include <WiFi.h>
 #include <string.h>
-
+/*
+ * Written by Arthur Apicella 3/3/2020
+ *
+ */
 // Network stuff
-const char *ssid = "0045167901";
-const char *password = "d2437369be";
+//Put in your home network here
+const char *ssid = "XXXXX";
+const char *password = "XXXXX";
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 3600;
@@ -100,6 +104,7 @@ void getLocalTime() {
     theTime+=" Minutes To ";
     hour++;
   }
+  //Bug midnight was 00 not 12
   if ((hour == 12) and (minute == 0)) {
     Serial.print((AM) ? " Noon " : " Midnight ");
     theTime+=(AM) ? " Noon " : " Midnight ";
@@ -111,7 +116,7 @@ void getLocalTime() {
      theTime+=" O'Clock";
     
     /*
-     * 12:00am= Midnight
+     * 12:00am= Midnight (00:00)
      * 12:00am- Dawn (Sunrise)= Early morning
      * Dawn-12:00pm (Noon)= Morning
      * 12:00pm (Noon)
@@ -121,6 +126,12 @@ void getLocalTime() {
     if ((timeinfo.tm_hour > 5) and (timeinfo.tm_hour < 12)) {
       Serial.print(" in the Morning");
       theTime+=" in the Morning";
+        
+    // Add in Prevening here
+    // } else if ((timeinfo.tm_hour > 11) and (timeinfo.tm_hour < 16)){
+    //  Serial.print(" in the Prevening");
+    //  theTime+=" in the Prevening";
+
     } else if ((timeinfo.tm_hour > 11) and (timeinfo.tm_hour < 18)) {
       Serial.print(" in the Afternoon");
       theTime+=" in the Afternoon";
