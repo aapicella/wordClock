@@ -4,6 +4,7 @@
 #include <string.h>
 /*
  * Written by Arthur Apicella 3/3/2020
+ * aapicella@gmail.com
  *
  */
 // Network stuff
