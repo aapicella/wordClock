@@ -12,7 +12,7 @@ const int daylightOffset_sec = 3600;
 const boolean PREVENING=true;   //Big Bang theory.  https://www.urbandictionary.com/define.php?term=prevening
 const boolean DISPLAY_DIGITAL=true;  //turn on displaying digital time after scrolling.
 
-#define timezone -7 // US Eastern Time Zone
+#define timezone -5 // US Eastern Time Zone
 /* LED Martix Stuff
  *  ESP32 --> LED MATRIX
  *  5v        VCC
