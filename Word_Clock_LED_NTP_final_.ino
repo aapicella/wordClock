@@ -2,19 +2,17 @@
 #include <MD_MAX72xx.h>
 #include <WiFi.h>
 #include <string.h>
-/*
- * Written by Arthur Apicella 3/3/2020
- * aapicella@gmail.com
- *
- */
+
 // Network stuff
-//Put in your home network here
-const char *ssid = "XXXXX";
-const char *password = "XXXXX";
+const char *ssid = "0045167901";
+const char *password = "d2437369be";
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 3600;
+const boolean PREVENING=true;   //Big Bang theory.  https://www.urbandictionary.com/define.php?term=prevening
+const boolean DISPLAY_DIGITAL=true;  //turn on displaying digital time after scrolling.
 
+#define timezone -7 // US Eastern Time Zone
 /* LED Martix Stuff
  *  ESP32 --> LED MATRIX
  *  5v        VCC
@@ -54,20 +52,20 @@ String clockTime="hh:mm";
  *  
  *  It's half past 6 o'Clock in the evening.
  */
-void getLocalTime() {
+void printLocalTime() {
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
     Serial.println("Failed to obtain time");
     return;
   }
-   theTime="It's ";
-  int hour = timeinfo.tm_hour;
-  int minute = timeinfo.tm_min;
 
+   theTime="It's ";
+  int hour = timeinfo.tm_hour %12;
+  int minute = timeinfo.tm_min;
+ 
   int AM = true;
-  if (timeinfo.tm_hour > 12) {
-    hour = timeinfo.tm_hour - 12;
-    AM = false;
+  if(timeinfo.tm_hour>11) {
+    AM=false;
   }
   clockTime=" ";
   if(hour <10){
@@ -105,11 +103,9 @@ void getLocalTime() {
     theTime+=" Minutes To ";
     hour++;
   }
-  //Bug midnight was 00 not 12
-  if ((hour == 12) and (minute == 0)) {
+  if ( (hour == 12) and (minute == 0)) {
     Serial.print((AM) ? " Noon " : " Midnight ");
-    theTime+=(AM) ? " Noon " : " Midnight ";
-
+    theTime+=(hour==12) ? " Noon " : " Midnight ";
   } else {
     Serial.print(numbers[hour]);
     theTime+=numbers[hour];
@@ -117,22 +113,19 @@ void getLocalTime() {
      theTime+=" O'Clock";
     
     /*
-     * 12:00am= Midnight (00:00)
+     * 12:00am= Midnight
      * 12:00am- Dawn (Sunrise)= Early morning
      * Dawn-12:00pm (Noon)= Morning
      * 12:00pm (Noon)
-     * Noon-6:00pm = Afternoon or prevening (If you saw the Big Bang Theory
+     * 4pm-6:00pm = Afternoon or prevening (If you saw the Big Bang Theory
      * Episode) 6:00pm- Sundown / Dusk= (Evening)
      */
     if ((timeinfo.tm_hour > 5) and (timeinfo.tm_hour < 12)) {
       Serial.print(" in the Morning");
       theTime+=" in the Morning";
-        
-    // Add in Prevening here
-    // } else if ((timeinfo.tm_hour > 11) and (timeinfo.tm_hour < 16)){
-    //  Serial.print(" in the Prevening");
-    //  theTime+=" in the Prevening";
-
+    } else if ( (PREVENING) and (timeinfo.tm_hour > 15 ) and (timeinfo.tm_hour < 18 )){
+      Serial.print(" in the Prevening");
+      theTime+=" in the Prevening";
     } else if ((timeinfo.tm_hour > 11) and (timeinfo.tm_hour < 18)) {
       Serial.print(" in the Afternoon");
       theTime+=" in the Afternoon";
@@ -160,10 +153,10 @@ void setup() {
   Serial.println(" CONNECTED");
   // init and get the time
 
-  #define timezone -5 // US Eastern Time Zone
 
-  configTime(timezone * 3600, 0, ntpServer);
-  getLocalTime();
+
+  configTime(timezone * 3600, daylightOffset_sec, ntpServer);
+  printLocalTime();
   // disconnect WiFi as it's no longer needed
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
@@ -172,10 +165,13 @@ void setup() {
 
 int len=0;
 void loop() {
-  getLocalTime();
+  printLocalTime();
   scrollText(theTime.c_str());
-  printText(0, MAX_DEVICES-1, clockTime.c_str());
-  delay(2000); 
+  if( DISPLAY_DIGITAL ){  
+    printText(0, MAX_DEVICES-1, clockTime.c_str());
+    delay(1500); 
+  }
+  delay(500); 
 }
 const int DELAYTIME=50;
 
