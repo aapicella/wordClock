@@ -4,8 +4,8 @@
 #include <string.h>
 
 // Network stuff
-const char *ssid = "0045167901";
-const char *password = "d2437369be";
+const char *ssid = "xxxxxxxxx";
+const char *password = "xxxxxxxx";
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 3600;
